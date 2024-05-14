@@ -673,6 +673,16 @@ class Argument:
                         except ValueError:
                             slices[i] += "-1"
                     func_replacement = f"{name}[{','.join(slices)}].size"
+                # If this is formatted as "<slice>[,<slice>][,<kind>]", translate the slice(s)..
+                elif (re.match(r"^\s*(:|[\w]+)\s*(,\s*(:|([\w]+(=\s*\w+\s*)?)))*$", argument) is not None):
+                    slices = argument.split(",")[:2]
+                    for i in range(min(len(slices), 2)):  # Skip "KIND=..." optional third argument.
+                        if (slices[i].strip() == ":"): continue
+                        try:
+                            slices[i] = str(int(slices[i])-1)
+                        except ValueError:
+                            slices[i] += "-1"
+                    func_replacement = ','.join(slices)
                 # Otherwise, the contents of `SIZE(...)` cannot be parsed successfully.
                 else:
                     raise(NotImplementedError("The contents of 'SIZE' could not be parsed successfully. If this is valid Fortran syntax, consider raising an issue with a minimum necessary example from this code.\n\n  "+size))
