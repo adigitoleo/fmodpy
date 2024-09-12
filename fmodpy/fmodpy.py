@@ -289,6 +289,8 @@ def fimport(input_fortran_file, name=None, build_dir=None,
         try:
             module = importlib.import_module(name)
             module = importlib.reload(module)
+        except ModuleNotFoundError:
+            module = None
         finally:
             sys.path.pop(0)
     # Regardless of errors, reconfigure 'fmodpy' to work the way it did before this execution.
